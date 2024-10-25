@@ -1,0 +1,44 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ing-portal
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /                 # 컨테이너 내에 /usr/shre/nginx/httpd/ - shop(예시)/index.html인가 아니면 index.html인가를 정의하는 곳
+    #nginx.ingress.kubernetes.io/use-regex: "true"
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: www.test.com                                                  # ip만 접속한다고 하면 host 필요없음 / 하지만 host로 접속하면 host name 필요함
+    http:
+      paths:
+      - pathType: Prefix
+        path: /shop$
+        backend:
+          service:
+            name: svc-shop
+            port: 
+              number: 80
+      - pathType: Prefix
+        path: /blog$
+        backend:
+          service:
+            name: svc-blog
+            port: 
+              number: 80
+      - pathType: Prefix
+        path: /($)
+        backend:
+          service:
+            name: svc-main
+            port: 
+              number: 80
+      - pathType: Prefix
+        path: /*
+        backend:
+          service:
+            name: svc-nopage
+            port: 
+              number: 80
+
+# 첫 번째 접속 방법 http://211.183.3.202/shop
+# 두 번째 접속 방법 http://www.test.com/shop

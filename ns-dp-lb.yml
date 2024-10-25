@@ -1,0 +1,49 @@
+---
+# namespace 작성(별도의 project 공간/작업 공간: 여기 지우면 전체 지워짐)
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: ohsung
+
+---
+# deployment 작성
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ohsung-dp
+  namespace: ohsung
+  labels:
+    app: web
+    part: cloud
+spec:
+  replicas : 3
+  selector:
+    matchLabels:
+      app: web
+  template:
+    metadata:
+      labels:
+        app: web
+    spec:
+      containers:
+      - name: web
+        image: nginx
+        ports:
+        - containerPort: 80
+
+---
+# service LB 작성
+apiVersion: v1
+kind: Service
+metadata: 
+  name: ohsung-lb
+  namespace: ohsung
+spec: 
+  type: LoadBalancer
+  selector:
+    app: web
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 80
+    # NodePort:         # 랜덤이므로 지정할 필요 없음 / 여러 서비스가 노드포트를 공유하므로 겹치지 않도록 랜덤 설정이 오히려 좋다
